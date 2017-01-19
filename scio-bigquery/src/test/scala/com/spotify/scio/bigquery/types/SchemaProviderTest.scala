@@ -77,6 +77,7 @@ class SchemaProviderTest extends FlatSpec with Matchers {
     SchemaProvider.schemaOf[RepeatedNested] should equal (parseSchema(recordFields("REPEATED")))
   }
 
+
   case class User(@description("user name") name: String, @description("user age") age: Int)
   case class Account(@description("account user") user: User,
                      @description("in USD") balance: Double)

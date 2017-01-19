@@ -18,8 +18,8 @@
 package com.spotify.scio
 
 import com.google.api.services.bigquery.model.TableReference
-import com.google.cloud.dataflow.sdk.io.BigQueryIO
 import com.google.cloud.dataflow.sdk.io.BigQueryIO.Write.{CreateDisposition, WriteDisposition}
+import com.google.cloud.dataflow.sdk.io.PatchedBigQueryIO
 import com.spotify.scio.bigquery.BigQueryClient
 import com.spotify.scio.bigquery.types.BigQueryType.HasAnnotation
 import com.spotify.scio.io.{Tap, Taps}
@@ -86,7 +86,7 @@ package object experimental {
         }
       } else {
         // newSource can be either table or query
-        val table = scala.util.Try(BigQueryIO.parseTableSpec(newSource)).toOption
+        val table = scala.util.Try(PatchedBigQueryIO.parseTableSpec(newSource)).toOption
         if (table.isDefined) {
           self.bigQueryTable(table.get)
         } else {
@@ -119,7 +119,11 @@ package object experimental {
       import scala.concurrent.ExecutionContext.Implicits.global
       self
         .map(bqt.toTableRow)
-        .saveAsBigQuery(table, bqt.schema, writeDisposition, createDisposition)
+        .saveAsBigQuery(table,
+          bqt.schema,
+          writeDisposition,
+          createDisposition,
+          bqt.tableDescription.orNull)
         .map(_.map(bqt.fromTableRow))
     }
 
@@ -154,7 +158,8 @@ package object experimental {
                             createDisposition: CreateDisposition = null)
                            (implicit ct: ClassTag[T], tt: TypeTag[T], ev: T <:< HasAnnotation)
     : Future[Tap[T]] =
-      saveAsTypedBigQuery(BigQueryIO.parseTableSpec(tableSpec), writeDisposition, createDisposition)
+      saveAsTypedBigQuery(
+        PatchedBigQueryIO.parseTableSpec(tableSpec), writeDisposition, createDisposition)
 
   }
 
@@ -198,7 +203,7 @@ package object experimental {
         }
       } else {
         // newSource can be either table or query
-        val table = scala.util.Try(BigQueryIO.parseTableSpec(newSource)).toOption
+        val table = scala.util.Try(PatchedBigQueryIO.parseTableSpec(newSource)).toOption
         if (table.isDefined) {
           self.getTableRows(table.get)
         } else {
@@ -231,7 +236,7 @@ package object experimental {
      writeDisposition: WriteDisposition = WRITE_EMPTY,
      createDisposition: CreateDisposition = CREATE_IF_NEEDED): Unit =
       writeTypedRows(
-        BigQueryIO.parseTableSpec(tableSpec), rows,
+        PatchedBigQueryIO.parseTableSpec(tableSpec), rows,
         writeDisposition, createDisposition)
 
   }
@@ -254,7 +259,7 @@ package object experimental {
         }
       } else {
         // newSource can be either table or query
-        val table = scala.util.Try(BigQueryIO.parseTableSpec(newSource)).toOption
+        val table = scala.util.Try(PatchedBigQueryIO.parseTableSpec(newSource)).toOption
         if (table.isDefined) {
           self.bigQueryTable(table.get)
         } else {

@@ -227,12 +227,14 @@ lazy val scioTest: Project = Project(
   description := "Scio helpers for ScalaTest",
   libraryDependencies ++= Seq(
     "org.scalatest" %% "scalatest" % scalaTestVersion,
+    "org.slf4j" % "slf4j-jdk14" % slf4jVersion % "test",
     // DataFlow testing requires junit and hamcrest
-    "junit" % "junit" % junitVersion,
-    "com.novocode" % "junit-interface" % junitInterfaceVersion,
     "org.hamcrest" % "hamcrest-all" % hamcrestVersion,
     "com.spotify" % "annoy" % "0.2.5" % "test",
-    "com.spotify.sparkey" % "sparkey" % "2.1.3" % "test"
+    "com.spotify.sparkey" % "sparkey" % "2.1.3" % "test",
+    "org.mockito" % "mockito-all" % "1.10.19" % "test",
+    "junit" % "junit" % junitVersion,
+    "com.novocode" % "junit-interface" % junitInterfaceVersion
   ),
   addCompilerPlugin(paradiseDependency)
 ).configs(

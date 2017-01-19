@@ -78,6 +78,15 @@ object BigQueryType {
   }
 
   /**
+   * Trait for companion objects of case classes generated with table description.
+   * @group trait
+   */
+  trait HasTableDescription {
+    /** Case class table description. */
+    def tableDescription: String
+  }
+
+  /**
    * Trait for companion objects of case classes generated with SELECT query.
    * @group trait
    */
@@ -228,6 +237,10 @@ class BigQueryType[T: TypeTag] {
 
   /** Table reference from the annotation. */
   def table: Option[String] = Try(getField("table").asInstanceOf[String]).toOption
+
+  /** Table description from the annotation. */
+  def tableDescription: Option[String] =
+    Try(getField("tableDescription").asInstanceOf[String]).toOption
 
   /** Query from the annotation. */
   def query: Option[String] = Try(getField("query").asInstanceOf[String]).toOption

@@ -459,7 +459,7 @@ class ScioContext private[scio] (val options: PipelineOptions,
     } else {
       val queryJob = this.bigQueryClient.newQueryJob(sqlQuery, flattenResults)
       _queryJobs.append(queryJob)
-      wrap(this.applyInternal(gio.BigQueryIO.Read.from(queryJob.table).withoutValidation()))
+      wrap(this.applyInternal(gio.PatchedBigQueryIO.Read.from(queryJob.table).withoutValidation()))
         .setName(sqlQuery)
     }
   }
@@ -469,11 +469,11 @@ class ScioContext private[scio] (val options: PipelineOptions,
    * @group input
    */
   def bigQueryTable(table: TableReference): SCollection[TableRow] = requireNotClosed {
-    val tableSpec: String = gio.BigQueryIO.toTableSpec(table)
+    val tableSpec: String = gio.PatchedBigQueryIO.toTableSpec(table)
     if (this.isTest) {
       this.getTestInput(BigQueryIO(tableSpec))
     } else {
-      wrap(this.applyInternal(gio.BigQueryIO.Read.from(table))).setName(tableSpec)
+      wrap(this.applyInternal(gio.PatchedBigQueryIO.Read.from(table))).setName(tableSpec)
     }
   }
 
@@ -482,7 +482,7 @@ class ScioContext private[scio] (val options: PipelineOptions,
    * @group input
    */
   def bigQueryTable(tableSpec: String): SCollection[TableRow] =
-    this.bigQueryTable(gio.BigQueryIO.parseTableSpec(tableSpec))
+    this.bigQueryTable(gio.PatchedBigQueryIO.parseTableSpec(tableSpec))
 
   /**
    * Get an SCollection for a Datastore query.

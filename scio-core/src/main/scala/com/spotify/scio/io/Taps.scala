@@ -19,7 +19,7 @@ package com.spotify.scio.io
 
 import com.google.api.client.util.{BackOff, BackOffUtils, Sleeper}
 import com.google.api.services.bigquery.model.TableReference
-import com.google.cloud.dataflow.sdk.io.BigQueryIO
+import com.google.cloud.dataflow.sdk.io.PatchedBigQueryIO
 import com.google.cloud.dataflow.sdk.util.FluentBackoff
 import com.google.protobuf.Message
 import com.spotify.scio.bigquery.{BigQueryClient, TableRow}
@@ -53,7 +53,7 @@ trait Taps {
 
   /** Get a `Future[Tap[TableRow]]` for BigQuery table. */
   def bigQueryTable(tableSpec: String): Future[Tap[TableRow]] =
-    bigQueryTable(BigQueryIO.parseTableSpec(tableSpec))
+    bigQueryTable(PatchedBigQueryIO.parseTableSpec(tableSpec))
 
   /** Get a `Future[Tap[TableRow]]` of TableRow for a JSON file. */
   def tableRowJsonFile(path: String): Future[Tap[TableRow]] =
